@@ -1,0 +1,11 @@
+{
+	"title": "Post Schema",
+	"type": "object",
+	"properties": {
+		"name": { "type": "string" },
+		"content": { "type": "string" },
+		"hashedPassword": { "type": "string" }
+	},
+	"additionalProperties": false,
+	"required": ["name", "content"]
+}

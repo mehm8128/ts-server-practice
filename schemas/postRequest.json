@@ -1,0 +1,11 @@
+{
+	"title": "PostRequest Schema",
+	"type": "object",
+	"properties": {
+		"name": { "type": "string" },
+		"content": { "type": "string" },
+		"password": { "type": "string" }
+	},
+	"additionalProperties": false,
+	"required": ["name", "content"]
+}

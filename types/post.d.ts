@@ -5,7 +5,8 @@
  * and run json-schema-to-typescript to regenerate this file.
  */
 
-export interface HeadersSchema {
-  "h-Custom"?: string;
-  [k: string]: unknown;
+export interface PostSchema {
+  name: string;
+  content: string;
+  hashedPassword?: string;
 }

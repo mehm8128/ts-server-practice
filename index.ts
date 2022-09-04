@@ -1,61 +1,62 @@
 import fastify from "fastify"
+import crypto from "crypto"
 
 // import json schemas as normal
-import QuerystringSchema from "./schemas/querystring.json"
-import HeadersSchema from "./schemas/headers.json"
+import PostSchema from "./schemas/post.json"
+import PostRequestSchema from "./schemas/postRequest.json"
 
 // import the generated interfaces
-import { QuerystringSchema as QuerystringSchemaInterface } from "./types/querystring"
-import { HeadersSchema as HeadersSchemaInterface } from "./types/headers"
+import { PostSchema as PostSchemaType } from "./types/post"
+import { PostRequestSchema as PostRequestSchemaInterface } from "./types/postRequest"
 
 const server = fastify()
 
-server.get<{
-	Querystring: QuerystringSchemaInterface
-	Headers: HeadersSchemaInterface
-}>(
-	"/auth",
-	{
-		schema: {
-			querystring: QuerystringSchema,
-			headers: HeadersSchema,
-		},
-		preValidation: (request, reply, done) => {
-			const { username, password } = request.query
-			done(username !== "admin" ? new Error("Must be admin") : undefined)
-		},
-		//  or if using async
-		//  preValidation: async (request, reply) => {
-		//    const { username, password } = request.query
-		//    if (username !== "admin") throw new Error("Must be admin");
-		//  }
-	},
-	async (request, reply) => {
-		const customerHeader = request.headers["h-Custom"]
-		// do something with request data
-		return `logged in!`
-	}
-)
-
-server.route<{
-	Querystring: QuerystringSchemaInterface
-	Headers: HeadersSchemaInterface
-}>({
+server.route({
 	method: "GET",
-	url: "/auth2",
+	url: "/post",
 	schema: {
-		querystring: QuerystringSchema,
-		headers: HeadersSchema,
-	},
-	preHandler: (request, reply, done) => {
-		const { username, password } = request.query
-		const customerHeader = request.headers["h-Custom"]
-		done()
+		response: {
+			200: {
+				type: "array",
+				items: PostSchema,
+			},
+		},
 	},
 	handler: (request, reply) => {
-		const { username, password } = request.query
-		const customerHeader = request.headers["h-Custom"]
-		reply.status(200).send({ username })
+		//todo:DB
+		const response: PostSchemaType = {} as PostSchemaType
+		reply.status(200).send(response)
+	},
+})
+
+server.route<{
+	Body: PostRequestSchemaInterface
+}>({
+	method: "POST",
+	url: "/post",
+	schema: {
+		body: PostRequestSchema,
+		response: {
+			200: {
+				type: "object",
+				item: PostSchema,
+			},
+		},
+	},
+	handler: (request, reply) => {
+		const response: PostSchemaType = {
+			name: request.body.name,
+			content: request.body.content,
+			hashedPassword: "",
+		}
+		if (request.body.password) {
+			response.hashedPassword = crypto
+				.createHash("sha256")
+				.update(request.body.password)
+				.digest("hex")
+		}
+		//todo:DB
+		reply.status(200).send(response)
 	},
 })
 

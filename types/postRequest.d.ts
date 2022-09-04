@@ -5,7 +5,8 @@
  * and run json-schema-to-typescript to regenerate this file.
  */
 
-export interface QuerystringSchema {
-  username: string;
+export interface PostRequestSchema {
+  name: string;
+  content: string;
   password?: string;
 }
